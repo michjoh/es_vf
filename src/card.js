@@ -1,3 +1,5 @@
+const ClientError = require("./clientError");
+
 const LIMIT_ASSIGNED = 'LIMIT_ASSIGNED';
 const CARD_WITHDRAWN = 'CARD_WITHDRAWN';
 const CARD_REPAID = 'CARD_REPAID';
@@ -58,22 +60,21 @@ module.exports = function cardModule(now) {
             assignLimit(amount) {
                 // business invariant/rule
                 if (limitAlreadyAssigned()) {
-                    throw new Error('Cannot assign limit for the second time');
+                    throw new ClientError('Cannot assign limit for the second time');
                 }
                 applyWithRecord({type: LIMIT_ASSIGNED, amount, card_id, date: now().toJSON()});
             },
             availableLimit,
             withdraw(amount) {
                 if (!limitAlreadyAssigned()) {
-                    throw new Error('No limit assigned');
+                    throw new ClientError('No limit assigned');
                 }
                 if (notEnoughMoney(amount)) {
-                    throw new Error('Not enough money');
+                    throw new ClientError('Not enough money');
                 }
                 applyWithRecord({type: CARD_WITHDRAWN, amount, card_id, date: now().toJSON()});
             },
             repay(amount) {
-                const event = {type: 'CARD_REPAID', amount, card_id, date: now().toJSON()};
                 applyWithRecord({type: CARD_REPAID, amount, card_id, date: now().toJSON()});
             },
             uuid() {
