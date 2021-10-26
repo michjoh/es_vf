@@ -40,6 +40,9 @@ module.exports = function cardModule(now) {
 
         return {
             apply,
+            flushEvents() {
+                events = [];
+            },
             assignLimit(amount) {
                 // business invariant/rule
                 if (limitAlreadyAssigned()) {
