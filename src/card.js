@@ -2,7 +2,7 @@ const LIMIT_ASSIGNED = 'LIMIT_ASSIGNED';
 const CARD_WITHDRAWN = 'CARD_WITHDRAWN';
 const CARD_REPAID = 'CARD_REPAID';
 
-// favor compsition over inheritance
+// favor composition over inheritance
 function eventTracker(apply) {
     let events = [];
 
@@ -22,7 +22,7 @@ function eventTracker(apply) {
 
 module.exports = function cardModule(now) {
     function card(card_id) {
-        let events = []; // generic
+        let {applyWithRecord, ...tracker} = eventTracker(apply);
         let limit;
         let used = 0;
 
@@ -51,17 +51,10 @@ module.exports = function cardModule(now) {
             }
         }
 
-        function applyWithRecord(event) {
-            events.push(event);
-            return apply(event);
-        }
 
         return {
+            ...tracker,
             apply,
-            // generic
-            flushEvents() {
-                events = [];
-            },
             assignLimit(amount) {
                 // business invariant/rule
                 if (limitAlreadyAssigned()) {
@@ -82,10 +75,6 @@ module.exports = function cardModule(now) {
             repay(amount) {
                 const event = {type: 'CARD_REPAID', amount, card_id, date: now().toJSON()};
                 applyWithRecord({type: CARD_REPAID, amount, card_id, date: now().toJSON()});
-            },
-            // generic
-            pendingEvents() {
-                return events;
             },
             uuid() {
                 return card_id;
