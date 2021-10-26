@@ -5,8 +5,8 @@ module.exports = function cardRepositoryFactory(recreateFrom) {
         async save(card) {
             const oldEvents = storage[card.uuid()] || [];
             const allEvents = [...oldEvents, ...card.pendingEvents()];
-            card.flushEvents();
             storage[card.uuid()] = allEvents;
+            card.flushEvents();
         },
         async load(uuid) {
             return recreateFrom(uuid, storage[uuid] || []);
