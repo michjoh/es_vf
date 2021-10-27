@@ -19,6 +19,11 @@ function initStore(config = {
         return es.store.db && es.store.db.close();
     }
 
+    es.useEventPublisher(function(evt, callback) {
+        console.log('emitting event', evt);
+        callback();
+    });
+
     return new Promise(function(resolve, reject) {
         es.init(function (err) {
             if(err) reject(err);
